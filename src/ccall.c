@@ -1,75 +1,42 @@
+#include <ncurses.h>
 #include "../include/ccall.h"
 
-ccall_error
-ccall_init(WINDOW *ncurses_window){
-    ccall_error ret = CCALL_SUCCESS;
-    ncurses_window = initscr();
-
-    if(ncurses_window == NULL){
-        ret = CCALL_FAILURE;
-        fprintf(stderr, "Failed to initialize ncurses");
-    } else {
-        /* Don't echo printed characters to screen */
-        noecho();
-
-        /* Get all the mouse events */
-        mousemask(ALL_MOUSE_EVENTS, NULL);
-    }
-
-    return ret;
-}
-
-ccall_error ccall_fini(){
-    ccall_error ret = CCALL_SUCCESS;
-
-    if(endwin() == ERR){
-        ret = CCALL_FAILURE;
-        fprintf(stderr, "Failed to end ncurses");
-    }
-
-    return ret;
-}
-
-ccall_error ccall_run(WINDOW *ncurses_window){
-    int c;
-    int count =0;
-    MEVENT event;
-
-    raw();
-    clear();
-    cbreak();	//Line buffering disabled. pass on everything
-
-    printw("-- CCALL Help Phone --");
-    while((c = getch()) != 'q') {
-        count++;
-        mvprintw(1, 50, "Has mouse: %d", has_mouse());
-        mvprintw(10, 50, "Event: %i", count);
-
-        if (c == KEY_MOUSE) {
-                if (getmouse(&event) == OK) {    /* When the user clicks left mouse button */
-                        mvprintw(100, 1, "%s, %s", event.x + 1, event.y + 1);
-                }
-        }
-        refresh();
-    }
-}
 
 int main() {
+    int ch, count=0;
+    MEVENT event;
+
     /* Initialize ncurses */
-    ccall_error ret = CCALL_SUCCESS;
-    WINDOW *ncurses_window = NULL;
+    initscr();
+    raw();
+    keypad(stdscr, TRUE);
+    noecho();
 
-    /* Make sure initialization and run are successful */
-    if((ccall_init(ncurses_window) != CCALL_SUCCESS) || (ccall_run(ncurses_window) != CCALL_SUCCESS)){
-        ccall_fini();
-        exit(EXIT_FAILURE);
+    clear();
+    cbreak();
+
+    mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
+
+    while ((ch = getch()) != 'q') {
+        count++;
+        mvprintw(1, 1, "Has mouse: %d", has_mouse());
+        mvprintw(2, 1, "Key code: %x; mouse code:%x", ch, KEY_MOUSE);
+        if (ch == KEY_MOUSE) {
+            if (getmouse(&event) == OK) {
+                mvprintw(3, 3, "Mouse Event: x=%d, y=%d z=%d",
+                         event.x, event.y, event.z);
+                mvprintw(4, 3, "Mouse device id: %x", event.id);
+                mvprintw(5, 3, "Mouse button mask: %x", event.bstate);
+
+                if(event.bstate == BUTTON1_CLICKED){
+                    mvprintw(10, 3, "Left clicked");
+                } else if(event.bstate == BUTTON3_CLICKED){
+                    mvprintw(10, 3, "Right clicked");
+                }
+            }
+        }
+        mvprintw(6, 1, "Event number: %4d",count);
+        refresh();
     }
-
-
-    /* Clean up ncurses */
-    if(ccall_fini() != CCALL_SUCCESS){
-        exit(EXIT_FAILURE);
-    }
-
-    return EXIT_SUCCESS;
+    endwin();
 }
