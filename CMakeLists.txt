@@ -11,6 +11,7 @@ message("\nSearching for libraries")
 
 find_library(LINPHONE_LIB REQUIRED NAMES linphone)
 find_library(NCURSES_LIB REQUIRED NAMES ncurses)
+find_library(LIBMEDIASTREAMER_LIB REQUIRED NAMES libmediastreamer_base mediastreamer_base)
 
 if(NCURSES_LIB)
     message("ncurses library found at: ${NCURSES_LIB}")
@@ -24,6 +25,13 @@ if(LINPHONE_LIB)
     list(APPEND CCALL_LINK_LIBRARIES "${LINPHONE_LIB}")
 else()
     message(FATAL_ERROR "linphone library not found")
+endif()
+
+if(LIBMEDIASTREAMER_LIB)
+    message("libmediastreamer library found at: ${LIBMEDIASTREAMER_LIB}")
+    list(APPEND CCALL_LINK_LIBRARIES "${LIBMEDIASTREAMER_LIB}")
+else()
+    message(FATAL_ERROR "libmediastreamer library not found")
 endif()
 
 set(SOURCE_FILES src/ccall.c include/ccall.h)

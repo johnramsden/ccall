@@ -9,14 +9,24 @@
 #include <stdlib.h>
 #include <ncurses.h>
 #include <curses.h>
+#include <signal.h>
+
+#include "linphone/core.h"
 
 typedef enum ccall_error {
     CCALL_SUCCESS,
     CCALL_FAILURE
 } ccall_error;
 
-ccall_error ccall_init(WINDOW *ncurses_window);
-ccall_error ccall_fini();
-ccall_error ccall_run(WINDOW *ncurses_window);
+typedef struct ccall_authentication {
+    const char * 	username;
+    const char * 	userid;
+    const char * 	passwd;
+    const char * 	ha1;
+    const char * 	realm;
+    const char * 	domain;
+} ccall_authentication_t;
+
+ccall_error make_call(WINDOW *ncurses_window, ccall_authentication_t *authentication, const char *dest_num);
 
 #endif //CCALL_CCALL_H
