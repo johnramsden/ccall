@@ -15,7 +15,8 @@ typedef enum ccall_error {
     CCALL_FAILURE
 } ccall_error;
 
-ccall_error ccall_init();
+ccall_error ccall_init(WINDOW *ncurses_window);
 ccall_error ccall_fini();
+ccall_error ccall_run(WINDOW *ncurses_window);
 
 #endif //CCALL_CCALL_H
