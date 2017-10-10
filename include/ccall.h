@@ -27,6 +27,6 @@ typedef struct ccall_authentication {
     const char * 	domain;
 } ccall_authentication_t;
 
-ccall_error make_call(WINDOW *ncurses_window, ccall_authentication_t *authentication, const char *dest_num);
+ccall_error make_call(WINDOW *ncurses_window, MEVENT *event, const char *config, const char *dest_num);
 
 #endif //CCALL_CCALL_H
