@@ -12,6 +12,7 @@ void ccall_usage(){
 }
 
 ccall_error make_call(WINDOW *ncurses_window, MEVENT *event, const char *config, const char *dest_num) {
+    running=TRUE;
     ccall_error ret = CCALL_SUCCESS;
     int ch = 0;
     int event_count = 0;
@@ -68,11 +69,10 @@ ccall_error make_call(WINDOW *ncurses_window, MEVENT *event, const char *config,
             linphone_core_terminate_call(lp_config,call);
             linphone_call_unref(call);
         }
-        wmove(ncurses_window,30,0);
-        wclrtoeol(ncurses_window);
+
         linphone_core_unref(lp_config);
     }
-
+    clear();
     return ret;
 }
 
@@ -139,6 +139,12 @@ int main(int argc, char **argv) {
                     wmove(ncurses_window,20,0);
                     wclrtoeol(ncurses_window);
                     make_call(ncurses_window, &event, config, dest_num);
+
+                    mvprintw(1, 15, "CCALL Help Phone");
+                    mvprintw(5, 1, "Usage:");
+                    mvprintw(7, 1, "Phone - Left click:");
+                    mvprintw(8, 1, "Hang up - Right click:");
+
                 } else if(event.bstate == BUTTON3_CLICKED){
                     wmove(ncurses_window,20,0);
                     wclrtoeol(ncurses_window);
