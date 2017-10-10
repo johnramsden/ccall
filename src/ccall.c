@@ -22,6 +22,8 @@ ccall_error make_call(WINDOW *ncurses_window, MEVENT *event, const char *config,
 
     // Place an outgoing call
     LinphoneCall *call = linphone_core_invite(lp_config, dest_num);
+    linphone_core_set_in_call_timeout(lp_config, 10);
+
     call = linphone_call_ref(call);
     if (call == NULL) {
         wmove(ncurses_window,30,0);
@@ -35,17 +37,25 @@ ccall_error make_call(WINDOW *ncurses_window, MEVENT *event, const char *config,
 
         linphone_call_ref(call);
 
-        while(running/* && ((ch = getch()) != 'q')*/){
+        while(running){
+            linphone_core_iterate(lp_config);
+            ms_usleep(50000);
+
             // Watch for attempts to quit
-            if (/*(ch == KEY_MOUSE) && */(getmouse(event) == OK) && (event->bstate == BUTTON3_CLICKED)) {
-                    wmove(ncurses_window,20,0);
-                    wclrtoeol(ncurses_window);
-                    mvprintw(20, 3, "Hanging up...");
-                    running = FALSE;
-            } else {
-                linphone_core_iterate(lp_config);
-                ms_usleep(50000);
+//            if (((ch = getch()) == 'q') || (ch == KEY_MOUSE) ) {
+//                if((getmouse(event) == OK) && (event->bstate == BUTTON3_CLICKED)) {
+//                    wmove(ncurses_window, 20, 0);
+//                    wclrtoeol(ncurses_window);
+//                    mvprintw(20, 3, "Hanging up...");
+//                    running = FALSE;
+//                }
+//            }
+
+            if (linphone_call_get_state(call) == LinphoneCallEnd){
+                running = FALSE;
+                clear();
             }
+
             mvprintw(30, 5, "Running... %i", event_count++);
             refresh();
         }
@@ -134,6 +144,7 @@ int main(int argc, char **argv) {
                     wclrtoeol(ncurses_window);
                     mvprintw(20, 3, "Hanging up...");
                 }
+            ch = 0;
         }
         mvprintw(16, 1, "Event number: %4d",count);
         refresh();
