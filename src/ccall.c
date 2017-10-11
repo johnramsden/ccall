@@ -1,6 +1,9 @@
 #include <ncurses.h>
 #include "../include/ccall.h"
 
+#define ONE_SECOND_COUNT_MULTIPLIER 200
+#define TIMEOUT_CALL_SECONDS 15
+
 static bool_t running=TRUE;
 static void stop(int signum){
     running=FALSE;
@@ -23,7 +26,8 @@ ccall_error make_call(WINDOW *ncurses_window, MEVENT *event, const char *config,
 
     // Place an outgoing call
     LinphoneCall *call = linphone_core_invite(lp_config, dest_num);
-    linphone_core_set_in_call_timeout(lp_config, 10);
+    linphone_core_set_in_call_timeout(lp_config, TIMEOUT_CALL_SECONDS);
+    linphone_core_set_log_level_mask(0);
 
     call = linphone_call_ref(call);
     if (call == NULL) {
@@ -35,13 +39,26 @@ ccall_error make_call(WINDOW *ncurses_window, MEVENT *event, const char *config,
         wmove(ncurses_window,30,0);
         wclrtoeol(ncurses_window);
         mvprintw(30, 5, "Call to %s is in progress...", dest_num);
-
+        refresh();
         linphone_call_ref(call);
 
+        int microsecond_count = 0;
+        int timeout = TIMEOUT_CALL_SECONDS;
         while(running){
+            // Print time remaing in call
+            if((microsecond_count++ % 20) == 0){
+                wmove(ncurses_window,35,5);
+                wclrtoeol(ncurses_window);
+                if(timeout >= 0){
+                    mvprintw(35, 5, "Ending call in %i seconds", timeout--);
+                    refresh();
+                }
+            }
             linphone_core_iterate(lp_config);
             ms_usleep(50000);
-
+            wmove(ncurses_window,30,5);
+            wclrtoeol(ncurses_window);
+            mvprintw(30, 5, "Call to %s is in progress...", dest_num);
             // Watch for attempts to quit
 //            if (((ch = getch()) == 'q') || (ch == KEY_MOUSE) ) {
 //                if((getmouse(event) == OK) && (event->bstate == BUTTON3_CLICKED)) {
@@ -54,11 +71,7 @@ ccall_error make_call(WINDOW *ncurses_window, MEVENT *event, const char *config,
 
             if (linphone_call_get_state(call) == LinphoneCallEnd){
                 running = FALSE;
-                clear();
             }
-
-            mvprintw(30, 5, "Running... %i", event_count++);
-            refresh();
         }
         if (linphone_call_get_state(call) != LinphoneCallEnd){
 
