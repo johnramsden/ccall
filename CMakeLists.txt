@@ -3,7 +3,7 @@ project(ccall)
 
 set(CMAKE_C_STANDARD 11)
 
-# Find required libraries
+## Find required libraries ##
 
 list(APPEND CCALL_LINK_LIBRARIES "")
 
@@ -35,6 +35,15 @@ else()
 endif()
 
 set(SOURCE_FILES src/ccall.c include/ccall.h)
+
+## Link and Compile ##
+
 add_executable(ccall ${SOURCE_FILES})
 
 target_link_libraries(ccall ${CCALL_LINK_LIBRARIES})
+
+## Install ##
+
+install( TARGETS ccall RUNTIME DESTINATION bin )
+
+# Compile example: make DESTDIR=/usr install
