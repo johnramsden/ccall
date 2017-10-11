@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.8)
 project(ccall)
 
+set(CCALL_MAJOR_VERSION 0)
+set(CCALL_MINOR_VERSION 1)
+set(CCALL_PATCH_VERSION 0)
+set(CCALL_VERSION
+  ${CCALL_MAJOR_VERSION}.${CCALL_MINOR_VERSION}.${CCALL_PATCH_VERSION})
+
 set(CMAKE_C_STANDARD 11)
 
 ## Find required libraries ##
