@@ -1,56 +1,30 @@
-# This is an example PKGBUILD file. Use this as a start to creating your own,
-# and remove these comments. For more information, see 'man PKGBUILD'.
-# NOTE: Please fill out the license field for your package! If it is unknown,
-# then please put 'unknown'.
-
-# The following guidelines are specific to BZR, GIT, HG and SVN packages.
-# Other VCS sources are not natively supported by makepkg yet.
-
-# Maintainer: Your Name <youremail@domain.com>
-pkgname=ccall-git # '-bzr', '-git', '-hg' or '-svn'
+# Maintainer: John Ramsden <johnramsden [at] riseup [dot] com>
+pkgname=ccall-git
 pkgver=0.1.0
 pkgrel=1
-pkgdesc=""
-# arch=()
-url=""
-license=('BSD')
-# groups=()
-depends=(linphone)
-makedepends=('git' 'cmake') # 'bzr', 'git', 'mercurial' or 'subversion'
-provides=("${pkgname%-VCS}")
-conflicts=("${pkgname%-VCS}")
-# replaces=()
-# backup=()
-# options=()
-# install=
-source=('git+https://github.com/johnramsden/ccall')
-noextract=()
+pkgdesc="ncurses program for calling sip number on click"
+arch=('i686' 'x86_64')
+url="https://github.com/johnramsden/ccall"
+license=('BSD' 'custom:BSD 3 clause')
+depends=("linphone")
+makedepends=('git' 'cmake')
+provides=("${pkgname%-git}")
+conflicts=("${pkgname%-git}")
+source=("git+https://github.com/johnramsden/ccall.git")
 md5sums=('SKIP')
 
-# Please refer to the 'USING VCS SOURCES' section of the PKGBUILD man page for
-# a description of each element in the source array.
 pkgver() {
-  cd "$pkgname"
-  git describe --long --tags | sed 's/-/.r/;s/-/./'
+    cd "${srcdir}/${pkgname%-git}"
+    git describe --long --tags | sed 's/-/.r/;s/-/./'
 }
 
-# pkgver() {
-#         cd "$srcdir/${pkgname%-VCS}"
-#
-# # Git, tags available
-#         printf "%s" "$(git describe --long | sed 's/\([^-]*-\)g/r\1/;s/-/./g')"
-#
-# # Git, no tags available
-#         printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
-# }
-
 build() {
-        cd "$srcdir/${pkgname%-VCS}"
-        cmake -DCMAKE_INSTALL_PREFIX=/usr .
-        make
+    cd "${srcdir}/${pkgname%-git}"
+    cmake -DCMAKE_INSTALL_PREFIX=/usr .
+    make
 }
 
 package() {
-        cd "$srcdir/${pkgname%-VCS}"
-        make DESTDIR="$pkgdir/" install
+    cd "${srcdir}/${pkgname%-git}"
+    make DESTDIR="${pkgdir}/" install
 }

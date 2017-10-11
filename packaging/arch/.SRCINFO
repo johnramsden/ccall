@@ -1,0 +1,19 @@
+pkgbase = ccall-git
+	pkgdesc = ncurses program for calling sip number on click
+	pkgver = 0.1.0
+	pkgrel = 1
+	url = https://github.com/johnramsden/ccall
+	arch = i686
+	arch = x86_64
+	license = BSD
+	license = custom:BSD 3 clause
+	makedepends = git
+	makedepends = cmake
+	depends = linphone
+	provides = ccall
+	conflicts = ccall
+	source = git+https://github.com/johnramsden/ccall.git
+	md5sums = SKIP
+
+pkgname = ccall-git
+
