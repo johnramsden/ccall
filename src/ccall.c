@@ -2,7 +2,7 @@
 #include "../include/ccall.h"
 
 #define ONE_SECOND_COUNT_MULTIPLIER 200
-#define TIMEOUT_CALL_SECONDS 15
+#define TIMEOUT_CALL_SECONDS 45
 
 static bool_t running=TRUE;
 static void stop(int signum){
